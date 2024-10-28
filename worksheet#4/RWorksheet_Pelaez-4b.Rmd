@@ -1,0 +1,177 @@
+---
+title: "Worksheet-4b in R"
+author: "Riza Angelique Pelaez"
+date: "2024-10-28"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# Task 1: Create a 5x5 Matrix Using a for Loop
+matrix_5x5 <- matrix(0, nrow=5, ncol=5)
+vectorA <- c(1, 2, 3, 4, 5)
+for (i in 1:5) {
+  matrix_5x5[i, ] <- abs(vectorA)
+}
+print("5x5 Matrix with vectorA:")
+print(matrix_5x5)
+```
+
+
+```{r}
+# Task 2: Print the String "*" Using a for Loop
+print("Pyramid of '*' using for loop:")
+for (i in 1:5) {
+  cat(rep("*", i), "\n")
+}
+```
+
+
+```{r}
+# Task 3: Get user input for the first two numbers in the Fibonacci sequence
+n1 <- as.integer(readline(prompt="Enter the first number: "))
+n2 <- as.integer(readline(prompt="Enter the second number: "))
+
+if (is.na(n1) || is.na(n2)) {
+  cat("Please enter valid integers.\n")
+} else {
+  cat("Fibonacci sequence up to 500:\n")
+  
+  repeat {
+    cat(n1, " ")
+    fib <- n1 + n2
+    if (fib > 500) break
+    n1 <- n2
+    n2 <- fib
+  }
+
+  cat("\n")
+}
+```
+
+
+```{r}
+# Task 4: Import File and Perform Operations
+library(dplyr)
+#a.R script for importing an excel or a csv file
+ShoeSize <- read.csv("ShoeSizes.csv")
+cat("First 6 rows of the ShoeSize:\n")
+print(head(ShoeSize))
+
+#b. Subset for male and female
+female <- subset(ShoeSize, Gender == "F")
+male <- subset(ShoeSize, Gender == "M")
+cat("Number of females:", nrow(female), "\n")
+cat("Number of males:", nrow(male), "\n")
+
+#c. Graph for the number of males and females
+str(ShoeSize)
+head(ShoeSize)
+
+ShoeSize$Gender <- as.factor(ShoeSize$Gender)
+
+gender_counts <- ShoeSize %>%
+  group_by(Gender) %>%
+  summarise(Count = n(), .groups = 'drop')
+
+barplot(gender_counts$Count, 
+        names.arg = gender_counts$Gender, 
+        col = c("pink", "blue" ),
+        main = "Number of Females and Males in Shoe Sizes",
+        xlab = "Gender", 
+        ylab = "Count",
+        ylim = c(0, max(gender_counts$Count) + 5))
+
+legend("topright", legend = levels(ShoeSize$Gender), fill = c("pink", "blue"))
+
+```
+
+
+```{r}
+# Task 5: Monthly Income Pie Chart
+expenses <- c(Food=60, Electricity=10, Savings=5, Miscellaneous=25)
+pie(expenses, main="Monthly Income Distribution", col=rainbow(length(expenses)),
+    labels=paste0(names(expenses), " ", round(100 * expenses / sum(expenses), 1), "%"))
+```
+
+
+```{r}
+# Task 6: Iris Dataset Operations
+data(iris)
+
+# a. Check the structure
+cat("Structure of the iris dataset:\n")
+str(iris)
+
+# b. Calculate means of Sepal and Petal measurements
+iris_means <- colMeans(iris[, 1:4])
+cat("Means of Sepal and Petal measurements:\n")
+print(iris_means)
+
+# c. Pie chart for Species distribution
+species_counts <- table(iris$Species)
+pie(species_counts, main="Species Distribution", col=c("pink", "green", "skyblue"),
+    labels=names(species_counts))
+
+# d. Subset each species and show the last six rows
+setosa <- subset(iris, Species == "setosa")
+versicolor <- subset(iris, Species == "versicolor")
+virginica <- subset(iris, Species == "virginica")
+cat("Last 6 rows of Setosa species:\n")
+print(tail(setosa))
+cat("Last 6 rows of Versicolor species:\n")
+print(tail(versicolor))
+cat("Last 6 rows of Virginica species:\n")
+print(tail(virginica))
+
+# e. Scatterplot of Sepal measurements by species
+plot(iris$Sepal.Length, iris$Sepal.Width, col=iris$Species, pch=19,
+     main="Iris Dataset: Sepal Width and Length",
+     xlab="Sepal Length", ylab="Sepal Width")
+legend("topright", legend=levels(iris$Species), col=c("pink", "green", "skyblue"), pch=19)
+```
+
+
+```{r}
+
+# Task 7: Alexa Variations Dataset Cleaning and Plotting
+
+# a. Rename white and black variants
+library(readxl)
+alexafile <- read_excel("alexa_file.xlsx")
+alexafile$variation <- gsub("Black ", "Black_", alexafile$variation)
+alexafile$variation <- gsub("White ", "White_", alexafile$variation)
+print(head(alexafile))
+
+# b. Count each variation and save as variations.RData
+library(dplyr)
+variation_counts <- alexafile %>%
+  count(variation)
+save(variation_counts, file = "variations.RData")
+print(variation_counts)
+
+# c. Barplot for each variation count
+load("variations.RData")
+barplot(variation_counts$n, 
+        names.arg = variation_counts$variation, 
+        col = "purple",
+        main = "Alexa Variations Count",
+        ylab = "Frequency")
+
+# d. Barplot for black and white variants side by side
+black_white_counts <- variation_counts %>% 
+  filter(grepl("Black|White", variation))
+barplot(black_white_counts$n, 
+        names.arg = black_white_counts$variation,
+        col = c("black", "white"), 
+        beside = TRUE,
+        main = "Black and White Alexa Variants",
+        ylab = "Frequency")
+
+
+
+```
